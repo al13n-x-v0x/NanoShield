@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+weights/*.pt
+weights/*.bin
+*.onnx
+data/training_data.txt
+.env

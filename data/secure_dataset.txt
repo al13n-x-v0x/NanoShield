@@ -1,0 +1,277 @@
+NanoShield Security Training Data
+===================================
+This dataset contains curated code samples, vulnerability patterns, and security explanations
+for training the NanoShield transformer model.
+
+---
+VULNERABILITY: SQL INJECTION
+
+# VULNERABLE CODE (Python)
+import sqlite3
+conn = sqlite3.connect("users.db")
+username = request.args.get("user")
+query = "SELECT * FROM users WHERE name = '" + username + "'"
+cursor.execute(query)  # SQL INJECTION RISK: user input concatenated into query
+
+# SECURE CODE (Python)
+import sqlite3
+conn = sqlite3.connect("users.db")
+username = request.args.get("user")
+query = "SELECT * FROM users WHERE name = ?"
+cursor.execute(query, (username,))  # Parameterized query - safe
+
+EXPLANATION: SQL injection occurs when user input is directly concatenated into SQL queries.
+An attacker can inject malicious SQL code like ' OR '1'='1 to bypass authentication.
+Always use parameterized queries or ORM binding to prevent this vulnerability.
+
+---
+VULNERABILITY: CROSS-SITE SCRIPTING (XSS)
+
+# VULNERABLE CODE (JavaScript)
+const userInput = req.query.name;
+document.getElementById("greeting").innerHTML = "Hello, " + userInput;
+
+# SECURE CODE (JavaScript)
+const userInput = req.query.name;
+const safe = document.createElement("span");
+safe.textContent = "Hello, " + userInput;  // textContent auto-escapes HTML
+document.getElementById("greeting").appendChild(safe);
+
+EXPLANATION: XSS attacks inject malicious scripts into web pages. Using innerHTML with
+unsanitized input allows attackers to execute arbitrary JavaScript. Always use textContent
+or proper output encoding. Implement Content-Security-Policy headers as defense-in-depth.
+
+---
+VULNERABILITY: HARDCODED CREDENTIALS
+
+# VULNERABLE CODE (Python)
+DB_PASSWORD = "super_secret_123"
+api_key = "sk-1234567890abcdef"
+
+def connect_db():
+    return psycopg2.connect(password=DB_PASSWORD)
+
+# SECURE CODE (Python)
+import os
+
+def connect_db():
+    password = os.environ.get("DB_PASSWORD")
+    if not password:
+        raise ValueError("DB_PASSWORD environment variable not set")
+    return psycopg2.connect(password=password)
+
+EXPLANATION: Hardcoded credentials in source code are exposed via version control,
+code sharing, and reverse engineering. Use environment variables, secret managers
+(AWS Secrets Manager, HashiCorp Vault), or encrypted config files instead.
+
+---
+VULNERABILITY: WEAK CRYPTOGRAPHY
+
+# VULNERABLE CODE (Python)
+import hashlib
+password_hash = hashlib.md5(user_password.encode()).hexdigest()
+
+# SECURE CODE (Python)
+import bcrypt
+password_hash = bcrypt.hashpw(user_password.encode(), bcrypt.gensalt(rounds=12))
+
+EXPLANATION: MD5 and SHA1 are cryptographically broken for password hashing.
+They are fast to compute, making brute-force attacks trivial. Use bcrypt, scrypt,
+or Argon2 which include salting and key stretching to resist rainbow table attacks.
+
+---
+VULNERABILITY: COMMAND INJECTION
+
+# VULNERABLE CODE (Python)
+import os
+filename = request.args.get("file")
+os.system("cat " + filename)  # COMMAND INJECTION: attacker can run任意 commands
+
+# SECURE CODE (Python)
+import subprocess
+filename = request.args.get("file")
+# Validate filename contains no shell metacharacters
+if not re.match(r'^[\w\-\.]+$', filename):
+    raise ValueError("Invalid filename")
+result = subprocess.run(["cat", filename], capture_output=True, text=True)
+
+EXPLANATION: Command injection occurs when user input is passed to system commands.
+Attackers can chain commands using ; | & ` or $(command). Use subprocess with list
+arguments (not shell=True) and validate all input against a strict whitelist.
+
+---
+VULNERABILITY: PATH TRAVERSAL
+
+# VULNERABLE CODE (Python)
+def read_file(user_path):
+    full_path = os.path.join("/var/www/uploads", user_path)
+    return open(full_path).read()  # PATH TRAVERSAL: ../../etc/passwd works
+
+# SECURE CODE (Python)
+import os
+def read_file(user_path):
+    base_dir = "/var/www/uploads"
+    full_path = os.path.realpath(os.path.join(base_dir, user_path))
+    if not full_path.startswith(os.path.realpath(base_dir) + os.sep):
+        raise ValueError("Path traversal detected")
+    return open(full_path).read()
+
+EXPLANATION: Path traversal attacks use ../ sequences to access files outside the
+intended directory. Always resolve paths with os.path.realpath and verify the
+resolved path starts with the expected base directory.
+
+---
+VULNERABILITY: INSECURE DESERIALIZATION
+
+# VULNERABLE CODE (Python)
+import pickle
+data = pickle.loads(user_input)  # INSECURE: arbitrary code execution possible
+
+# SECURE CODE (Python)
+import json
+data = json.loads(user_input)  # JSON is safe for structured data
+
+# Or for YAML:
+import yaml
+data = yaml.safe_load(user_input)  # safe_load prevents code execution
+
+EXPLANATION: Pickle and yaml.load can execute arbitrary code during deserialization.
+Never deserialize data from untrusted sources with pickle. Use JSON for structured
+data, or yaml.safe_load for YAML. If pickle is absolutely required, use a signature
+verification mechanism before deserialization.
+
+---
+VULNERABILITY: BUFFER OVERFLOW (C)
+
+# VULNERABLE CODE (C)
+void process_input(char *user_input) {
+    char buffer[64];
+    strcpy(buffer, user_input);  // BUFFER OVERFLOW: no bounds checking
+}
+
+# SECURE CODE (C)
+void process_input(char *user_input) {
+    char buffer[64];
+    strncpy(buffer, user_input, sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0';  // Null-terminate explicitly
+}
+
+EXPLANATION: strcpy copies data without checking source length, allowing attackers
+to overwrite adjacent memory. Always use bounded functions like strncpy or snprintf.
+Consider using safer languages (Rust, Go) for memory-critical code.
+
+---
+VULNERABILITY: RACE CONDITION
+
+# VULNERABLE CODE (Python)
+balance = 0
+
+def withdraw(amount):
+    global balance
+    temp = balance  # READ
+    # Context switch can happen here
+    balance = temp - amount  # WRITE: stale value
+
+# SECURE CODE (Python)
+import threading
+balance = 0
+lock = threading.Lock()
+
+def withdraw(amount):
+    global balance
+    with lock:  # Atomic operation with mutex
+        balance -= amount
+
+EXPLANATION: Race conditions occur when multiple threads access shared state
+without synchronization. The check-then-act pattern (read-modify-write) is
+particularly vulnerable. Use locks, semaphores, or atomic operations to ensure
+data consistency in concurrent programs.
+
+---
+SECURITY PROTOCOL: TLS/SSL CONFIGURATION
+
+# INSECURE TLS Configuration
+import ssl
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # Deprecated protocol
+context.verify_mode = ssl.CERT_NONE  # No certificate verification
+
+# SECURE TLS Configuration
+import ssl
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+context.minimum_version = ssl.TLSVersion.TLSv1_2
+context.verify_mode = ssl.CERT_REQUIRED
+context.check_hostname = True
+
+EXPLANATION: Always use TLS 1.2 or higher. Never disable certificate verification
+in production. Enable hostname checking to prevent man-in-the-middle attacks.
+Use context.set_ciphers() to restrict to strong cipher suites.
+
+---
+SECURITY PROTOCOL: AUTHENTICATION BEST PRACTICES
+
+# SECURE: Password Storage with bcrypt
+import bcrypt
+def hash_password(password: str) -> bytes:
+    salt = bcrypt.gensalt(rounds=12)
+    return bcrypt.hashpw(password.encode("utf-8"), salt)
+
+def verify_password(password: str, hashed: bytes) -> bool:
+    return bcrypt.checkpw(password.encode("utf-8"), hashed)
+
+# SECURE: Session Token Generation
+import secrets
+session_token = secrets.token_urlsafe(32)  # 256-bit cryptographically secure token
+
+EXPLANATION: Use bcrypt/scrypt/Argon2 for password hashing with appropriate work
+factors. Generate session tokens using cryptographic random number generators
+(secrets module, not random module). Implement session expiration and rotation.
+
+---
+SECURITY PROTOCOL: INPUT VALIDATION
+
+# SECURE: Email Validation
+import re
+def validate_email(email: str) -> bool:
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, email))
+
+# SECURE: Integer Boundary Check
+def process_quantity(qty_str: str) -> int:
+    try:
+        qty = int(qty_str)
+    except ValueError:
+        raise ValueError("Invalid quantity")
+    if not (1 <= qty <= 1000):
+        raise ValueError("Quantity out of allowed range")
+    return qty
+
+EXPLANATION: Always validate and sanitize all user input at system boundaries.
+Use allowlists over blocklists. Validate type, length, range, and format.
+Implement proper error handling that doesn't leak internal system details.
+
+---
+SECURITY PROTOCOL: API KEY MANAGEMENT
+
+# INSECURE: API key in source code
+API_KEY = "sk-proj-abc123def456"  # NEVER commit secrets to version control
+
+# SECURE: Environment-based API key management
+import os
+from pathlib import Path
+
+def get_api_key(name: str) -> str:
+    key = os.environ.get(name)
+    if not key:
+        env_file = Path.home() / ".env"
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                if line.startswith(f"{name}="):
+                    key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                    break
+    if not key:
+        raise ValueError(f"Missing required API key: {name}")
+    return key
+
+EXPLANATION: API keys and secrets must never be committed to version control.
+Use environment variables or encrypted secret stores. Add .env files to .gitignore.
+Implement key rotation policies and use principle of least privilege for API permissions.

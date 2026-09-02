@@ -1,0 +1,19 @@
+{
+  "model_type": "nanoshield",
+  "vocab_size": 32000,
+  "max_seq_len": 2048,
+  "n_layers": 24,
+  "n_heads": 16,
+  "d_model": 1024,
+  "d_ff": 4096,
+  "dropout": 0.1,
+  "bias": true,
+  "rotary_embeddings": true,
+  "flash_attention": false,
+  "total_params_estimate": "~48M",
+  "quantization": {
+    "bits": 4,
+    "group_size": 128,
+    "method": "GPTQ"
+  }
+}
