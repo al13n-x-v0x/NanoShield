@@ -1,0 +1,59 @@
+{
+  "name": "nanoshield",
+  "displayName": "NanoShield - Security Scanner",
+  "description": "Real-time code security vulnerability scanner. Detects SQL injection, XSS, hardcoded credentials, weak crypto, and 20+ vulnerability classes. Works offline.",
+  "version": "0.1.0",
+  "publisher": "al13n-x-v0x",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Security", "Linters", "Programming Languages"],
+  "keywords": ["security", "vulnerability", "scanner", "sql injection", "xss", "owasp", "offline"],
+  "activationEvents": ["onLanguage:python", "onLanguage:javascript", "onLanguage:typescript", "onLanguage:c", "onLanguage:cpp", "onLanguage:java"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "nanoshield.scan", "title": "NanoShield: Scan Current File" },
+      { "command": "nanoshield.scanSelection", "title": "NanoShield: Scan Selected Code" },
+      { "command": "nanoshield.scanProject", "title": "NanoShield: Scan Entire Project" },
+      { "command": "nanoshield.showDashboard", "title": "NanoShield: Open Dashboard" },
+      { "command": "nanoshield.toggleLiveScan", "title": "NanoShield: Toggle Live Scanning" },
+      { "command": "nanoshield.exportReport", "title": "NanoShield: Export PDF Report" }
+    ],
+    "menus": {
+      "editor/context": [
+        { "command": "nanoshield.scanSelection", "when": "editorHasSelection", "group": "nanoshield" }
+      ],
+      "editor/title": [
+        { "command": "nanoshield.scan", "when": "editorIsDirty", "group": "navigation" }
+      ]
+    },
+    "keybindings": [
+      { "command": "nanoshield.scan", "key": "ctrl+shift+s", "mac": "cmd+shift+s" },
+      { "command": "nanoshield.toggleLiveScan", "key": "ctrl+shift+l", "mac": "cmd+shift+l" }
+    ],
+    "configuration": {
+      "title": "NanoShield",
+      "properties": {
+        "nanoshield.liveScan.enabled": { "type": "boolean", "default": true, "description": "Scan code on every save" },
+        "nanoshield.severityThreshold": { "type": "string", "default": "LOW", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"], "description": "Minimum severity to show inline" },
+        "nanoshield.showInlineMarks": { "type": "boolean", "default": true, "description": "Show vulnerability markers in the editor" },
+        "nanoshield.autoFix": { "type": "boolean", "default": true, "description": "Show quick-fix suggestions" }
+      }
+    },
+    "diagnosticCollectionLanguages": ["python", "javascript", "typescript", "c", "cpp", "java"],
+    "themes": [
+      {
+        "id": "nanoshield-dark",
+        "label": "NanoShield Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/dark.json"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0"
+  }
+}
