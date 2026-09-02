@@ -1,36 +1,22 @@
 # NanoShield 🛡️
 
-### On-Device Security Assistant with <50M Parameters
-A privacy-first, ultra-lightweight language model trained from scratch to audit source code and detect vulnerabilities entirely offline.
+### On-Device Security Assistant — Zero Internet Required
+A privacy-first, ultra-lightweight language model trained from scratch to audit source code and detect vulnerabilities entirely offline. **25 vulnerability patterns**, **web + desktop + mobile GUI**, **online/offline intelligence**.
 
 ---
 
-## 💡 Project Story
+## 💡 What is NanoShield?
 
-### Inspiration
-Developers consistently leak proprietary source code, API keys, and internal logs by pasting them into cloud-hosted LLMs for quick security checks. This exposes sensitive corporate data, creates vendor lock-in, and introduces network latency. 
+NanoShield is a security scanner that runs **entirely on your device**. Paste code → get instant vulnerability reports with fix suggestions. No data ever leaves your machine.
 
-We wanted to solve this by ditching the bloated billions of parameters used for general conversation. Instead, we focused on a singular question: *Can we compress elite cryptographic and security auditing capabilities into a model tiny enough to run locally on a standard laptop or smartphone?* This drove us to build a custom, privacy-centric model within a strict 50M parameter ceiling.
-
-### ⚙️ What it Does
-NanoShield is an on-device security assistant that requires zero internet connectivity. It scans code blocks, catches cryptographic mistakes (like weak hashing or hardcoded credentials), and identifies common OWASP vulnerabilities. Operating entirely in local memory, it eliminates data leakage risks and cuts API latency down to milliseconds.
-
-### 🛠️ How We Built It
-Staying under the 50M parameter cap required tight architectural constraints and highly selective data choices:
-* **The Architecture:** Designed a custom, lean Transformer with RMSNorm, rotary positional embeddings (RoPE), SwiGLU activations, and weight-tied embeddings to maximize reasoning efficiency per parameter.
-* **The Dataset:** Ignored general web text to save capacity. Curated a specialized dataset focused entirely on clean code syntax, cryptographic primitives, and known vulnerability patterns.
-* **The Training:** Raw PyTorch training loop with Mixed Precision (FP16), cosine learning rate decay with warmup, and gradient clipping to stabilize convergence on limited data.
-
-### 🚧 Challenges We Ran Into
-With only 50 million parameters, there is no buffer for noisy data. Early training runs resulted in severe loss spikes and syntax confusion on longer code files. We also fought overfitting because security code patterns can be highly repetitive. We resolved this by aggressively deduplicating our source data, adjusting our attention head scaling, and tuning dropout rates.
-
-### 🏆 Accomplishments
-We successfully engineered and trained a functional language model from the ground up that respects the strict 50M parameter limit. The model demonstrates genuine, localized understanding of code syntax and security flaws—proving that hyper-curated data and architectural discipline can achieve deep utility at a fraction of commercial model sizes.
-
-### 🔮 What's Next
-* **Quantization:** Compress weights to 4-bit for low-spec mobile hardware.
-* **IDE Integration:** VS Code extension for live, offline code security warnings.
-* **Dataset Expansion:** Smart contract vulnerabilities and Rust/Go memory safety edge cases.
+**Key Features:**
+- 🔍 **25 vulnerability patterns** — SQL injection, XSS, command injection, weak crypto, and more
+- 🧠 **AI auto-fix** — every finding includes a code fix suggestion
+- 📱 **Mobile responsive** — works on phones, tablets, desktops
+- 🌐 **Online/offline mode** — auto-detects connectivity; fetches latest CVEs when online
+- 🎨 **Animated dark UI** — uiverse.io-inspired glassmorphism, glowing orbs, smooth animations
+- ⚡ **~48M parameter model** — custom transformer with RoPE, RMSNorm, SwiGLU
+- 🚀 **One-click install** — `bash setup.sh` and you're running
 
 ---
 
@@ -38,49 +24,86 @@ We successfully engineered and trained a functional language model from the grou
 
 ```
 ├── config/
-│   └── model_config.json      # Custom 50M parameter hyperparameters
+│   └── model_config.json      # 48M parameter hyperparameters
 ├── data/
-│   ├── prepare_data.py        # Tokenization & code syntax preprocessing
-│   └── secure_dataset.txt     # Curated security/crypto training text
+│   ├── prepare_data.py        # Tokenization & deduplication
+│   └── secure_dataset.txt     # Curated security training data
+├── gui/
+│   ├── web_app.py             # Web GUI (Flask) — dark theme, animations, mobile
+│   ├── desktop_app.py         # Desktop GUI (Tkinter)
+│   └── mockup.html            # HTML design mockup
 ├── src/
-│   ├── model.py               # Custom Transformer architecture definition
-│   ├── train.py               # PyTorch training loop & validation
-│   └── inference.py           # Local CLI text generation & code scanner
-├── weights/                   # Saved model checkpoints
-├── requirements.txt           # Minimal dependency list
-└── README.md                  # Project documentation
+│   ├── model.py               # Custom Transformer (<50M params)
+│   ├── train.py               # PyTorch training with FP16
+│   └── inference.py           # CLI scanner & text generation
+├── weights/                   # Model checkpoints
+├── setup.sh                   # One-click installer
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone & Install
+### 1. Auto-Install (Recommended)
 ```bash
 git clone https://github.com/al13n-x-v0x/NanoShield.git
 cd NanoShield
-pip install -r requirements.txt
+bash setup.sh
 ```
 
-### 2. Prepare Training Data
+### 2. Run the Web GUI
 ```bash
-python data/prepare_data.py --input data/secure_dataset.txt
+python gui/web_app.py
+# Open http://localhost:5000
 ```
 
-### 3. Train the Model
+### 3. Run the Desktop GUI
 ```bash
-python src/train.py --data_path data/training_data.txt --epochs 50 --batch_size 4
+python gui/desktop_app.py
 ```
 
-### 4. Run the Security Scanner
+### 4. CLI Scanner
 ```bash
-python src/inference.py --input sample_code.py --checkpoint weights/best_model.pt
+python src/inference.py -i sample_code.py
 ```
 
-### 5. Generate Code
+### 5. Train the Model
 ```bash
-python src/inference.py --generate --prompt "def hash_password" --checkpoint weights/best_model.pt
+python src/train.py --data_path data/training_data.txt --epochs 50
 ```
+
+---
+
+## 🔍 Vulnerability Detection
+
+NanoShield detects **25 vulnerability classes** with OWASP & CWE mappings:
+
+| Category | Severity | OWASP | CWE |
+|---|---|---|---|
+| SQL Injection | 🔴 CRITICAL | A03:2021 | CWE-89 |
+| Command Injection | 🔴 CRITICAL | A03:2021 | CWE-78 |
+| Hardcoded Credentials | 🔴 CRITICAL | A07:2021 | CWE-798 |
+| Eval/Exec Usage | 🔴 CRITICAL | A03:2021 | CWE-95 |
+| Buffer Overflow | 🔴 CRITICAL | A06:2021 | CWE-120 |
+| XSS | 🟠 HIGH | A03:2021 | CWE-79 |
+| Weak Crypto | 🟠 HIGH | A02:2021 | CWE-327 |
+| Path Traversal | 🟠 HIGH | A01:2021 | CWE-22 |
+| Insecure Deserialization | 🟠 HIGH | A08:2021 | CWE-502 |
+| SSRF | 🟠 HIGH | A10:2021 | CWE-918 |
+| XXE Injection | 🟠 HIGH | A05:2021 | CWE-611 |
+| Unrestricted File Upload | 🟠 HIGH | A04:2021 | CWE-434 |
+| Race Condition | 🟡 MEDIUM | A04:2021 | CWE-362 |
+| Open Redirect | 🟡 MEDIUM | A01:2021 | CWE-601 |
+| Missing Rate Limiting | 🟡 MEDIUM | A04:2021 | CWE-307 |
+| Weak Session Token | 🟡 MEDIUM | A07:2021 | CWE-330 |
+| Debug Mode | 🟡 MEDIUM | A05:2021 | CWE-489 |
+| CORS Misconfiguration | 🟡 MEDIUM | A05:2021 | CWE-942 |
+| Timing Attack | 🟡 MEDIUM | A02:2021 | CWE-208 |
+| Hardcoded IP | 🔵 LOW | A05:2021 | CWE-200 |
+| Insufficient Logging | 🔵 LOW | A09:2021 | CWE-778 |
+| Deprecated Functions | 🔵 LOW | A06:2021 | CWE-693 |
 
 ---
 
@@ -94,32 +117,46 @@ python src/inference.py --generate --prompt "def hash_password" --checkpoint wei
 | Hidden Dim | 1024 |
 | FFN Dim | 4096 |
 | Max Seq Len | 2048 |
-| Vocab Size | 32,000 |
 | Norm | RMSNorm |
 | Position | Rotary (RoPE) |
-| Activation | SwiGLU |
+| Activation | SwiGLU (SiLU) |
+| Weight Tying | ✓ |
 
 ---
 
-## 🔒 Vulnerability Detection
+## 🌐 Online / Offline Mode
 
-NanoShield detects and explains these vulnerability classes:
-
-| Category | Severity |
+| Mode | What happens |
 |---|---|
-| SQL Injection | 🔴 HIGH |
-| Command Injection | 🔴 HIGH |
-| Hardcoded Credentials | 🔴 HIGH |
-| XSS (Cross-Site Scripting) | 🟡 MEDIUM |
-| Weak Cryptography | 🟡 MEDIUM |
-| Path Traversal | 🟡 MEDIUM |
-| Buffer Overflow Risk | 🟡 MEDIUM |
-| Missing Authentication | 🟡 MEDIUM |
-| Insecure Deserialization | 🟡 MEDIUM |
-| Race Conditions | 🟡 MEDIUM |
+| **Online** | Fetches latest CVEs, OWASP updates, and security advisories in real-time |
+| **Offline** | Uses bundled knowledge base (~50KB JSON) with 2023 CWE Top 25, OWASP Top 10, crypto best practices |
+| **Auto** | Detects connectivity and switches automatically |
+
+---
+
+## 📱 Mobile Support
+
+The web GUI is fully responsive:
+- **Phone** (≤480px): Single-column layout, full-width scan button
+- **Tablet** (≤768px): Stacked editor + results
+- **Desktop** (>768px): Side-by-side editor + report
+
+---
+
+## 🎨 UI Features (uiverse.io inspired)
+
+- Glassmorphism cards with backdrop blur
+- Floating animated background orbs
+- Gradient-shifting logo
+- Pulsing status badges
+- Security score ring with animated fill
+- Slide-in vulnerability findings with staggered delays
+- Toast notifications
+- Shimmer loading states
+- Smooth scroll behavior
 
 ---
 
 ## 📄 License
 
-MIT License – see [LICENSE](LICENSE) for details.
+MIT License
