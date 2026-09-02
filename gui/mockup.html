@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NanoShield GUI Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #e0e0e0; min-height: 100vh; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0d1321 0%, #1a1f35 100%);
+    border-bottom: 1px solid #1e293b;
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header h1 {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(90deg, #00d4ff, #7b2fff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .badge {
+    background: linear-gradient(135deg, #0a2e1a, #1a3a2a);
+    color: #00ff88; font-size: 11px; font-weight: 600;
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid #00ff8833;
+    letter-spacing: 0.5px;
+  }
+  .header-right { display: flex; gap: 12px; align-items: center; }
+  .header-btn {
+    background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .header-btn:hover { background: #334155; color: white; }
+  .model-badge {
+    background: #1a1a2e; border: 1px solid #334155; color: #7b2fff;
+    padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  }
+
+  /* Container */
+  .container { max-width: 1280px; margin: 24px auto; padding: 0 24px; }
+
+  /* Stats Bar */
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 20px; }
+  .stat-card {
+    flex: 1; background: #111827; border: 1px solid #1e293b;
+    border-radius: 12px; padding: 20px 24px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .stat-card.danger::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+  .stat-card.warn::before { background: linear-gradient(90deg, #eab308, #ca8a04); }
+  .stat-card.safe::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+  .stat-card.info::before { background: linear-gradient(90deg, #00d4ff, #7b2fff); }
+  .stat-num { font-size: 36px; font-weight: 800; line-height: 1; }
+  .stat-card.danger .stat-num { color: #ef4444; }
+  .stat-card.warn .stat-num { color: #eab308; }
+  .stat-card.safe .stat-num { color: #22c55e; }
+  .stat-card.info .stat-num { color: #00d4ff; }
+  .stat-label { color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+
+  /* Panels */
+  .panel {
+    background: #111827; border: 1px solid #1e293b;
+    border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+  }
+  .panel-header {
+    padding: 16px 20px; border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-title { font-size: 13px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+  .panel-body { padding: 20px; }
+
+  /* Code Editor */
+  .code-editor {
+    background: #0a0e17; border: 1px solid #1e293b; border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: #e2e8f0; padding: 16px; line-height: 1.7;
+    position: relative; overflow: hidden;
+  }
+  .code-editor .line-num { color: #475569; user-select: none; display: inline-block; width: 30px; text-align: right; margin-right: 16px; }
+  .code-editor .keyword { color: #c084fc; }
+  .code-editor .string { color: #34d399; }
+  .code-editor .func { color: #60a5fa; }
+  .code-editor .comment { color: #64748b; font-style: italic; }
+  .code-editor .vuln-line { background: #ef444422; border-left: 3px solid #ef4444; margin-left: -19px; padding-left: 16px; display: block; }
+
+  /* Buttons */
+  .btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary { background: linear-gradient(135deg, #7b2fff, #00d4ff); color: white; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px #7b2fff44; }
+  .btn-secondary { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+  .btn-secondary:hover { background: #334155; color: white; }
+
+  /* Findings */
+  .finding {
+    border-radius: 10px; padding: 18px 20px; margin-bottom: 14px;
+    border-left: 4px solid; position: relative;
+  }
+  .finding.high { background: #1a0a0a; border-color: #ef4444; }
+  .finding.medium { background: #1a170a; border-color: #eab308; }
+  .finding .severity-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .finding.high .severity-badge { background: #ef444433; color: #ef4444; }
+  .finding.medium .severity-badge { background: #eab30833; color: #eab308; }
+  .finding .vuln-type { font-size: 16px; font-weight: 700; margin: 8px 0 6px; }
+  .finding .vuln-line { color: #94a3b8; font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  .finding .vuln-line code { background: #1e293b; padding: 2px 8px; border-radius: 4px; color: #f87171; }
+  .finding .fix { color: #22c55e; font-size: 13px; margin-top: 8px; }
+  .finding .fix::before { content: '💡 '; }
+
+  /* Layout Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px; color: #475569; font-size: 12px; border-top: 1px solid #1e293b; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <h1>🛡️ NanoShield</h1>
+    <span class="badge">LOCAL · PRIVATE · OFFLINE</span>
+  </div>
+  <div class="header-right">
+    <span class="model-badge">⚙️ ~48M params · INT4 Ready</span>
+    <button class="header-btn">📂 Open File</button>
+    <button class="header-btn">📥 Export Report</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card danger">
+      <div class="stat-num">3</div>
+      <div class="stat-label">High Severity</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Medium Severity</div>
+    </div>
+    <div class="stat-card safe">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Lines Clean</div>
+    </div>
+    <div class="stat-card info">
+      <div class="stat-num">0.3s</div>
+      <div class="stat-label">Scan Time</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- Code Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📝 Source Code</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" style="padding:8px 16px; font-size:13px;">🔍 Scan</button>
+          <button class="btn btn-secondary" style="padding:8px 16px; font-size:13px;">Clear</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div class="code-editor">
+<span class="line-num"> 1</span><span class="keyword">import</span> sqlite3
+<span class="line-num"> 2</span>conn = sqlite3.<span class="func">connect</span>(<span class="string">"users.db"</span>)
+<span class="line-num"> 3</span>username = request.args.<span class="func">get</span>(<span class="string">"user"</span>)
+<span class="vuln-line"><span class="line-num"> 4</span>query = <span class="string">"SELECT * FROM users WHERE name = '"</span> + username + <span class="string">"'"</span></span>
+<span class="vuln-line"><span class="line-num"> 5</span>cursor.<span class="func">execute</span>(query)  <span class="comment"># ⚠️ SQL INJECTION</span></span>
+<span class="line-num"> 6</span>
+<span class="line-num"> 7</span>password = <span class="string">"admin123"</span>
+<span class="line-num"> 8</span>api_key = <span class="string">"sk-1234567890abcdef"</span>
+<span class="line-num"> 9</span>
+<span class="line-num">10</span><span class="keyword">import</span> hashlib
+<span class="vuln-line"><span class="line-num">11</span>h = md5(password.<span class="func">encode</span>()).<span class="func">hexdigest</span>()  <span class="comment"># ⚠️ WEAK CRYPTO</span></span>
+<span class="line-num">12</span>
+<span class="vuln-line"><span class="line-num">13</span>os.<span class="func">system</span>(<span class="string">"cat "</span> + filename)  <span class="comment"># ⚠️ COMMAND INJECTION</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📋 Vulnerability Report</span>
+        <span style="color:#ef4444; font-size:13px; font-weight:600;">4 issues found</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="finding high">
+          <span class="severity-badge">HIGH</span>
+          <div class="vuln-type">🔴 SQL Injection</div>
+          <div class="vuln-line">Line 4-5: <code>cursor.execute(query)</code></div>
+          <div class="fix">Use parameterized queries: cursor.execute("SELECT * FROM users WHERE name = ?", (username,))</div>
+        </div>
+
+        <div class="finding high">
+          <span class="severity-badge">HIGH</span>
+          <div class="vuln-type">🔴 Hardcoded Credentials</div>
+          <div class="vuln-line">Line 7-8: <code>password = "admin123"</code></div>
+          <div class="fix">Use environment variables: os.environ.get("DB_PASSWORD")</div>
+        </div>
+
+        <div class="finding medium">
+          <span class="severity-badge">MEDIUM</span>
+          <div class="vuln-type">🟡 Weak Cryptography</div>
+          <div class="vuln-line">Line 11: <code>md5(password.encode())</code></div>
+          <div class="fix">Use bcrypt or argon2 for password hashing</div>
+        </div>
+
+        <div class="finding high">
+          <span class="severity-badge">HIGH</span>
+          <div class="vuln-type">🔴 Command Injection</div>
+          <div class="vuln-line">Line 13: <code>os.system("cat " + filename)</code></div>
+          <div class="fix">Use subprocess.run(["cat", filename]) with input validation</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  NanoShield v0.1.0 · On-device security assistant · No data leaves your machine · Built with ❤️ for privacy
+</div>
+
+</body>
+</html>

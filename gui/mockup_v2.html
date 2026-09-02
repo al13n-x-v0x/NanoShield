@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NanoShield GUI</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; color: #e0e0e0; width: 1400px; }
+  .header { background: #0d1321; border-bottom: 1px solid #1e293b; padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .h1 { font-size: 28px; font-weight: 800; color: #00d4ff; }
+  .badge { background: #1a3a2a; color: #00ff88; font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 20px; border: 1px solid #00ff8833; }
+  .model-badge { background: #1a1a2e; border: 1px solid #334155; color: #7b2fff; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+  .btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #7b2fff; color: white; }
+  .btn-secondary { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+  .container { max-width: 1280px; margin: 24px auto; padding: 0 24px; }
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 20px; }
+  .stat-card { flex: 1; background: #111827; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; text-align: center; border-top: 3px solid; }
+  .stat-card.danger { border-top-color: #ef4444; }
+  .stat-card.warn { border-top-color: #eab308; }
+  .stat-card.safe { border-top-color: #22c55e; }
+  .stat-card.info { border-top-color: #00d4ff; }
+  .stat-num { font-size: 36px; font-weight: 800; }
+  .stat-card.danger .stat-num { color: #ef4444; }
+  .stat-card.warn .stat-num { color: #eab308; }
+  .stat-card.safe .stat-num { color: #22c55e; }
+  .stat-card.info .stat-num { color: #00d4ff; }
+  .stat-label { color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+  .panel { background: #111827; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .panel-header { padding: 16px 20px; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-size: 13px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+  .panel-body { padding: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .code-editor { background: #0a0e17; border: 1px solid #1e293b; border-radius: 8px; font-family: 'Consolas', monospace; font-size: 13px; color: #e2e8f0; padding: 16px; line-height: 1.7; }
+  .ln { color: #475569; display: inline-block; width: 30px; text-align: right; margin-right: 16px; user-select: none; }
+  .kw { color: #c084fc; }
+  .str { color: #34d399; }
+  .fn { color: #60a5fa; }
+  .cm { color: #64748b; font-style: italic; }
+  .vline { background: #ef444422; border-left: 3px solid #ef4444; margin-left: -19px; padding-left: 16px; display: block; }
+  .finding { border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; border-left: 4px solid; }
+  .finding.high { background: #1a0a0a; border-color: #ef4444; }
+  .finding.medium { background: #1a170a; border-color: #eab308; }
+  .badge-s { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .finding.high .badge-s { background: #ef444433; color: #ef4444; }
+  .finding.medium .badge-s { background: #eab30833; color: #eab308; }
+  .vtype { font-size: 16px; font-weight: 700; margin: 8px 0 6px; }
+  .vline2 { color: #94a3b8; font-size: 13px; font-family: Consolas, monospace; }
+  .vline2 code { background: #1e293b; padding: 2px 8px; border-radius: 4px; color: #f87171; }
+  .fix { color: #22c55e; font-size: 13px; margin-top: 8px; }
+  .footer { text-align: center; padding: 30px; color: #475569; font-size: 12px; border-top: 1px solid #1e293b; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="h1">NanoShield</div>
+    <span class="badge">LOCAL · PRIVATE · OFFLINE</span>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;">
+    <span class="model-badge">~48M params · INT4 Ready</span>
+    <button class="btn btn-secondary">Open File</button>
+    <button class="btn btn-secondary">Export Report</button>
+  </div>
+</div>
+<div class="container">
+  <div class="stats-bar">
+    <div class="stat-card danger"><div class="stat-num">3</div><div class="stat-label">High Severity</div></div>
+    <div class="stat-card warn"><div class="stat-num">1</div><div class="stat-label">Medium Severity</div></div>
+    <div class="stat-card safe"><div class="stat-num">6</div><div class="stat-label">Lines Clean</div></div>
+    <div class="stat-card info"><div class="stat-num">0.3s</div><div class="stat-label">Scan Time</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Source Code</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary" style="padding:8px 16px;font-size:13px;">Scan</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:13px;">Clear</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div class="code-editor">
+<span class="ln">1</span><span class="kw">import</span> sqlite3
+<span class="ln">2</span>conn = sqlite3.<span class="fn">connect</span>(<span class="str">"users.db"</span>)
+<span class="ln">3</span>username = request.args.<span class="fn">get</span>(<span class="str">"user"</span>)
+<span class="vline"><span class="ln">4</span>query = <span class="str">"SELECT * FROM users WHERE name = '"</span> + username + <span class="str">"'"</span></span>
+<span class="vline"><span class="ln">5</span>cursor.<span class="fn">execute</span>(query)  <span class="cm"># SQL INJECTION</span></span>
+<span class="ln">6</span>
+<span class="ln">7</span>password = <span class="str">"admin123"</span>
+<span class="ln">8</span>api_key = <span class="str">"sk-1234567890abcdef"</span>
+<span class="ln">9</span>
+<span class="ln">10</span><span class="kw">import</span> hashlib
+<span class="vline"><span class="ln">11</span>h = md5(password.<span class="fn">encode</span>()).<span class="fn">hexdigest</span>()  <span class="cm"># WEAK CRYPTO</span></span>
+<span class="ln">12</span>
+<span class="vline"><span class="ln">13</span>os.<span class="fn">system</span>(<span class="str">"cat "</span> + filename)  <span class="cm"># COMMAND INJECTION</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Vulnerability Report</span>
+        <span style="color:#ef4444;font-size:13px;font-weight:600;">4 issues found</span>
+      </div>
+      <div class="panel-body">
+        <div class="finding high">
+          <span class="badge-s">HIGH</span>
+          <div class="vtype">SQL Injection</div>
+          <div class="vline2">Line 4-5: <code>cursor.execute(query)</code></div>
+          <div class="fix">Use parameterized queries: cursor.execute("SELECT * FROM users WHERE name = ?", (username,))</div>
+        </div>
+        <div class="finding high">
+          <span class="badge-s">HIGH</span>
+          <div class="vtype">Hardcoded Credentials</div>
+          <div class="vline2">Line 7-8: <code>password = "admin123"</code></div>
+          <div class="fix">Use environment variables: os.environ.get("DB_PASSWORD")</div>
+        </div>
+        <div class="finding medium">
+          <span class="badge-s">MEDIUM</span>
+          <div class="vtype">Weak Cryptography</div>
+          <div class="vline2">Line 11: <code>md5(password.encode())</code></div>
+          <div class="fix">Use bcrypt or argon2 for password hashing</div>
+        </div>
+        <div class="finding high">
+          <span class="badge-s">HIGH</span>
+          <div class="vtype">Command Injection</div>
+          <div class="vline2">Line 13: <code>os.system("cat " + filename)</code></div>
+          <div class="fix">Use subprocess.run(["cat", filename]) with input validation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer">NanoShield v0.1.0 - On-device security assistant - No data leaves your machine</div>
+</body>
+</html>
