@@ -1,4 +1,21 @@
 """
+NanoShield Web GUI v3 — Award-Winning iOS-Inspired Design
+
+This is a thin launcher that imports the award-winning GUI.
+For the full experience, run: python gui/award_gui.py
+
+Or run directly: python gui/pwa_server.py  (for PWA/offline support)
+"""
+# Redirect to award GUI
+from award_gui import app
+
+if __name__ == "__main__":
+    print("\n  🛡️  NanoShield — Award-Winning GUI")
+    print("  → http://localhost:5000\n")
+    app.run(debug=True, port=5000)
+
+# Original code below (legacy)
+'''
 NanoShield Web GUI v2 — Full Feature Set
 - Uiverse.io-style animations (glassmorphism, glow, particles)
 - Mobile responsive (phone + desktop)
@@ -824,3 +841,5 @@ if __name__ == "__main__":
     print("\n  NanoShield Web GUI v2")
     print("  → http://localhost:5000\n")
     app.run(debug=True, port=5000)
+'''
+
